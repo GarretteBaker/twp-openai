@@ -5,3 +5,5 @@ meta.txt
 meta2.txt
 result
 *.zip
+__pycache__/
+.venv/

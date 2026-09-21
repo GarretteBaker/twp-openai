@@ -124,9 +124,14 @@ var openaiService = (() => {
     serviceName: "openai",
     removeTranslationsWithError: reset,
     async translate(source, target, rows) {
-      const { openaiCredentials } = await browser.storage.local.get("openaiCredentials");
+      const { openaiCredentials: saved = {} } = await browser.storage.local.get("openaiCredentials");
       const generation = revision;
-      const job = queue.then(() => translateNow(source, target, rows, openaiCredentials, generation));
+      const job = queue.then(async () => {
+        if (generation !== revision) throw new Error("OpenAI settings changed. Translate again.");
+        if (lastFailure) throw lastFailure;
+        const detected = await openaiCredentials.resolve(saved);
+        return translateNow(source, target, rows, { ...saved, apiKey: detected.apiKey, model: saved.model || "gpt-4.1-mini" }, generation);
+      });
       // A failed job must not poison the queue promise. Keep the actual failure
       // latched separately so dynamic pages cannot repeatedly spend/retry.
       queue = job.then(() => undefined, () => undefined);

@@ -286,15 +286,17 @@
           <h3>OpenAI</h3>
           <p>Translate pages and selected text with your own OpenAI API account.</p>
           <label for="openaiKey">API key</label>
-          <input id="openaiKey" type="password" class="w3-input" autocomplete="off" spellcheck="false" placeholder="sk-… (leave blank to keep saved key)">
+          <input id="openaiKey" type="password" class="w3-input" autocomplete="off" spellcheck="false" placeholder="Optional override — otherwise detect from .bashrc">
+          <p><label><input id="openaiAutoDetect" type="checkbox" checked> Automatically detect the key from .bashrc using the local helper</label></p>
           <label for="openaiModel">Model ID</label>
           <input id="openaiModel" class="w3-input" value="gpt-4.1-mini" autocomplete="off" spellcheck="false">
           <p><button id="saveOpenAI" class="w3-button w3-blue w3-round">Save and use OpenAI</button>
           <button id="testOpenAI" class="w3-button w3-round">Test translation</button>
-          <button id="removeOpenAI" class="w3-button w3-round">Forget key</button></p>
+          <button id="removeOpenAI" class="w3-button w3-round">Forget saved key</button>
+          <button id="detectOpenAI" class="w3-button w3-round">Use detected key</button></p>
           <p id="openaiFeedback" role="status" style="white-space: pre-wrap;"></p>
           <p id="openaiError" role="alert" style="color: #c62828;"></p>
-          <small>Text goes directly to api.openai.com. The key stays in this Firefox profile and is excluded from settings exports. API usage is billed separately from ChatGPT. Dynamic page translation can make additional paid requests as content appears.</small>
+          <small>Text goes directly to api.openai.com. Detected keys stay in .bashrc and are read by the local helper. Manually entered keys stay in this Firefox profile. Keys are excluded from settings exports. API usage is billed separately from ChatGPT. Dynamic page translation can make additional paid requests as content appears.</small>
         </section>
         <div id="selectServiceContainer">
           <p>

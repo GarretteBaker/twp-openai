@@ -17,8 +17,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 ROOT = Path(__file__).resolve().parents[1]
 LIVE = '--live' in sys.argv
+NATIVE = '--native' in sys.argv
+assert not NATIVE or LIVE, '--native requires --live.'
 API_KEY = os.environ.pop('OPENAI_API_KEY', '') if LIVE else 'fake-test-key'
-assert API_KEY, 'Set OPENAI_API_KEY when using --live.'
+assert API_KEY or NATIVE, 'Set OPENAI_API_KEY when using --live, or add --native.'
 print('Using live OpenAI API with gpt-4.1-mini.' if LIVE else 'Using mocked API.', flush=True)
 def translated(text, expected):
     return expected in text.casefold() if LIVE else '[EN]' in text
@@ -35,6 +37,10 @@ class Fixture(BaseHTTPRequestHandler):
         pass
 
 mock = r'''
+openaiCredentials.resolve = async (saved = {}) => {
+  if (saved.apiKey) return {apiKey:saved.apiKey,source:'Firefox settings'};
+  throw new Error('No API key saved yet.');
+};
 const realFetch = globalThis.fetch;
 globalThis.fetch = async (url, options) => {
   if (url !== "https://api.openai.com/v1/responses") return realFetch(url, options);
@@ -59,6 +65,7 @@ with TemporaryDirectory(prefix='twp-firefox-test-') as tmp:
         options_html = (ROOT/'src/options/options.html').read_text().replace('</body>', '<script src="test-bridge.js"></script></body>')
         z.writestr('options/options.html', options_html)
         z.writestr('options/test-bridge.js', '''window.twpTestConfigExport = () => twpConfig.export();
+        window.twpTestCredentials = async () => (await browser.storage.local.get('openaiCredentials')).openaiCredentials;
         window.twpTestSend = async action => {
           const tabs = await browser.tabs.query({});
           const tab = tabs.find(t => t.url.startsWith('http://127.0.0.1:'));
@@ -78,8 +85,11 @@ with TemporaryDirectory(prefix='twp-firefox-test-') as tmp:
         driver.set_context('content')
         driver.get(origin + '/options/options.html#translations')
         wait = WebDriverWait(driver, 120 if LIVE else 20)
-        wait.until(lambda d: 'No API key' in d.find_element(By.ID, 'openaiFeedback').text)
-        driver.find_element(By.ID, 'openaiKey').send_keys(API_KEY)
+        wait.until(lambda d: d.find_element(By.ID, 'openaiFeedback').text)
+        if NATIVE:
+            assert '~/.bashrc' in driver.find_element(By.ID, 'openaiFeedback').text, driver.find_element(By.ID, 'openaiFeedback').text
+        else:
+            driver.find_element(By.ID, 'openaiKey').send_keys(API_KEY)
         driver.find_element(By.ID, 'saveOpenAI').click()
         wait.until(lambda d: 'Saved.' in d.find_element(By.ID, 'openaiFeedback').text)
         driver.find_element(By.ID, 'testOpenAI').click()
@@ -89,7 +99,11 @@ with TemporaryDirectory(prefix='twp-firefox-test-') as tmp:
             print(driver.find_element(By.ID, 'openaiFeedback').text, flush=True)
         assert driver.find_element(By.ID, 'pageTranslatorService').get_attribute('value') == 'openai'
         exported = driver.execute_script('return window.twpTestConfigExport()')
-        assert API_KEY not in exported and 'openaiCredentials' not in exported
+        assert (not API_KEY or API_KEY not in exported) and 'openaiCredentials' not in exported
+        if NATIVE:
+            stored = driver.execute_async_script("window.twpTestCredentials().then(arguments[0])")
+            assert not stored.get('apiKey'), 'Detected key must not be persisted in Firefox.'
+            print('PASS Firefox: native .bashrc detection without a stored key', flush=True)
         print('PASS Firefox: settings save, API test, default provider, credential-free export', flush=True)
         options_handle = driver.current_window_handle
         driver.switch_to.new_window('tab')

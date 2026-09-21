@@ -2,11 +2,12 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
-function harness(respond) {
+function harness(respond, native) {
  const data = { openaiCredentials: { apiKey: 'fake-key', model: 'test-model' } };
  const listeners = [];
  const calls = [];
- const browser = { storage: {
+ const nativeCalls = [];
+ const browser = { runtime: { sendNativeMessage: async (name, message) => { nativeCalls.push({name,message}); if (!native) throw Error("Helper not installed"); return native(); } }, storage: {
   local: { get: async () => data, set: async value => Object.assign(data, value) },
   onChanged: { addListener: fn => listeners.push(fn) },
  } };
@@ -19,8 +20,9 @@ function harness(respond) {
    return { ok: true, json: async () => ({ status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(paragraphs)}]}] }) };
   },
  });
+ vm.runInContext(fs.readFileSync('src/background/openaiCredentials.js','utf8'),context);
  vm.runInContext(fs.readFileSync('src/background/openaiService.js','utf8'),context);
- return { service:context.openaiService,data,calls, change(settings) {data.openaiCredentials=settings;listeners.forEach(fn=>fn({openaiCredentials:{newValue:settings}},'local'));} };
+ return { service:context.openaiService,data,calls,nativeCalls, change(settings) {data.openaiCredentials=settings;listeners.forEach(fn=>fn({openaiCredentials:{newValue:settings}},'local'));} };
 }
 const plain = x => JSON.parse(JSON.stringify(x));
 test('maps inline fragments and paragraphs exactly; sends no HTML, uses strict schema and store:false', async () => {
@@ -60,4 +62,19 @@ test('rejects oversized paragraph without truncation or network',async()=>{const
 test('OpenAI never falls back to another service for any language',()=>{
  const context=vm.createContext({});vm.runInContext(fs.readFileSync('src/lib/languages.js','utf8'),context);
  assert.equal(vm.runInContext("twpLang.getAlternativeService('xx','openai',true)",context),'openai');
+});
+
+test('native detection supplies a key without storing it in Firefox', async()=>{
+ const h=harness(null,()=>({apiKey:'sk-native-test',source:'~/.bashrc'}));h.change({model:'test-model'});
+ await h.service.translate('fr','en',[['Bonjour']]);
+ assert.equal(h.calls[0].opts.headers.Authorization,'Bearer sk-native-test');
+ assert.equal(h.data.openaiCredentials.apiKey,undefined);
+ assert.deepEqual(plain(h.nativeCalls),[{name:'local.twp_openai_key',message:{action:'get_key'}}]);
+});
+test('manual key overrides native detection',async()=>{
+ const h=harness(null,()=>{throw Error('Must not use native key');});await h.service.translate('fr','en',[['a']]);assert.equal(h.nativeCalls.length,0);
+});
+test('forgetting a key disables automatic rediscovery',async()=>{
+ const h=harness(null,()=>({apiKey:'sk-native-test'}));h.change({autoDetect:false});
+ await assert.rejects(h.service.translate('fr','en',[['a']]),/disabled/);assert.equal(h.nativeCalls.length,0);assert.equal(h.calls.length,0);
 });

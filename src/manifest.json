@@ -1,14 +1,20 @@
 {
   "manifest_version": 2,
   "default_locale": "en",
-  "name": "TWP – OpenAI fork",
+  "name": "TWP \u2013 OpenAI fork",
   "description": "Translate webpages and selected text with your own OpenAI API key, using TWP page handling.",
-  "version": "10.2.1.1",
+  "version": "10.2.1.2",
   "homepage_url": "https://github.com/GarretteBaker/twp-openai",
   "browser_specific_settings": {
     "gecko": {
       "id": "twp-openai@garrettbaker.local",
-      "strict_min_version": "128.0"
+      "strict_min_version": "140.0",
+      "data_collection_permissions": {
+        "required": [
+          "websiteContent",
+          "authenticationInfo"
+        ]
+      }
     }
   },
   "commands": {
@@ -71,7 +77,8 @@
     "storage",
     "activeTab",
     "contextMenus",
-    "webRequest"
+    "webRequest",
+    "nativeMessaging"
   ],
   "optional_permissions": [
     "webNavigation"
@@ -166,6 +173,7 @@
       "/lib/platformInfo.js",
       "/lib/i18n.js",
       "/background/translationCache.js",
+      "/background/openaiCredentials.js",
       "/background/openaiService.js",
       "/background/translationService.js",
       "/background/textToSpeech.js",
