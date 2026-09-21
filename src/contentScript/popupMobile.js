@@ -225,7 +225,9 @@ void (async function () {
   );
   const updateServiceIcon = () => {
     const service = twpConfig.get("pageTranslatorService");
-    if (service === "google") {
+    if (service === "openai") {
+      serviceIconElement.src = chrome.runtime.getURL("/icons/openai-translate.svg");
+    } else if (service === "google") {
       serviceIconElement.src = URL.createObjectURL(googleIcon);
     } else if (service === "yandex") {
       serviceIconElement.src = URL.createObjectURL(yandexIcon);

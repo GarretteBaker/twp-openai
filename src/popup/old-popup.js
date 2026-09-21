@@ -266,7 +266,11 @@ twpConfig
     let showSelectTargetLanguage = false;
 
     function updateInterface() {
-      if (currentPageTranslatorService == "yandex") {
+      $("#iconTranslate").setAttribute("title", currentPageTranslatorService);
+      $("#btnOptions option[value='translateInExternalSite']").hidden = currentPageTranslatorService === "openai";
+      if (currentPageTranslatorService == "openai") {
+        $("#iconTranslate").setAttribute("src", "/icons/openai-translate.svg");
+      } else if (currentPageTranslatorService == "yandex") {
         $("#btnOptions option[value='translateInExternalSite']").textContent =
           twpI18n.getMessage("msgOpenOnYandexTranslator");
         $("#iconTranslate").setAttribute(

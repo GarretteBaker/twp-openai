@@ -1,3 +1,5 @@
+> **OpenAI fork:** See [setup, testing, and implementation notes](README-OPENAI.md). This branch adds OpenAI page and text translation to upstream TWP.
+
 
 # <img src="https://github.com/FilipePS/Traduzir-paginas-web/blob/master/src/icons/icon-128.png" height="50"> Translate Web Pages
 

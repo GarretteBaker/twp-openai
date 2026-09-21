@@ -12362,7 +12362,7 @@ const twpLang = (function () {
 
   /** @type {Map<string, string>} */
   const alternatives = new Map();
-  const pageTranslationServices = ["google", "bing", "yandex"];
+  const pageTranslationServices = ["google", "bing", "yandex", "openai"];
   /**
    * gets an alternate translation service if the selected translation service does not support the current target language.
    * @param {string} lang
@@ -12375,6 +12375,8 @@ const twpLang = (function () {
     serviceName,
     forPageTranslation = false,
   ) {
+    // Never silently send an OpenAI translation to a different provider.
+    if (serviceName === "openai") return "openai";
     lang = twpLang.fixTLanguageCode(lang);
     if (!twpLang.SupportedLanguages[serviceName]) return null;
     if (

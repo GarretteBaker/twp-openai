@@ -1548,6 +1548,7 @@ const translationService = (function () {
   /** @type {Map<string, Service>} */
   const serviceList = new Map();
 
+  serviceList.set("openai", openaiService);
   serviceList.set("google", googleService);
   serviceList.set("yandex", yandexService);
   serviceList.set("bing", bingService);

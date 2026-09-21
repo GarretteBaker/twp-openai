@@ -282,6 +282,20 @@
       </div>
 
       <div id="translations" class="w3-container">
+        <section style="padding: 12px 0; max-width: 680px;">
+          <h3>OpenAI</h3>
+          <p>Translate pages and selected text with your own OpenAI API account.</p>
+          <label for="openaiKey">API key</label>
+          <input id="openaiKey" type="password" class="w3-input" autocomplete="off" spellcheck="false" placeholder="sk-… (leave blank to keep saved key)">
+          <label for="openaiModel">Model ID</label>
+          <input id="openaiModel" class="w3-input" value="gpt-4.1-mini" autocomplete="off" spellcheck="false">
+          <p><button id="saveOpenAI" class="w3-button w3-blue w3-round">Save and use OpenAI</button>
+          <button id="testOpenAI" class="w3-button w3-round">Test translation</button>
+          <button id="removeOpenAI" class="w3-button w3-round">Forget key</button></p>
+          <p id="openaiFeedback" role="status" style="white-space: pre-wrap;"></p>
+          <p id="openaiError" role="alert" style="color: #c62828;"></p>
+          <small>Text goes directly to api.openai.com. The key stays in this Firefox profile and is excluded from settings exports. API usage is billed separately from ChatGPT. Dynamic page translation can make additional paid requests as content appears.</small>
+        </section>
         <div id="selectServiceContainer">
           <p>
             <b data-i18n="lblPageTranslationService">Page translation service</b>
@@ -290,6 +304,7 @@
             <option value="google">Google</option>
             <option value="bing">Bing</option>
             <option value="yandex">Yandex</option>
+            <option value="openai">OpenAI</option>
           </select>
           <br />
           <p>
@@ -299,6 +314,7 @@
             <option value="google">Google</option>
             <option value="bing">Bing</option>
             <option value="yandex">Yandex</option>
+            <option value="openai">OpenAI</option>
             <option value="deepl">DeepL</option>
           </select>
           <br />
@@ -472,6 +488,7 @@
             <label for="btnEnableYandex" style="user-select: none;"><input type="checkbox" id="btnEnableYandex" checked>
               Yandex</label>
             <hr style="margin: 5px 0;">
+            <label for="btnEnableOpenAI"><input type="checkbox" id="btnEnableOpenAI" checked> OpenAI</label><br>
             <label for="btnEnableDeepL" style="user-select: none;"><input type="checkbox" id="btnEnableDeepL" checked>
               DeepL</label>
             <br>
@@ -768,6 +785,7 @@
     <script src="/lib/platformInfo.js"></script>
     <script src="/lib/i18n.js"></script>
     <script src="options.js"></script>
+    <script src="openai-options.js"></script>
 </body>
 
 </html>

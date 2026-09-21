@@ -13,7 +13,7 @@ const twpConfig = (function () {
     pageTranslatorService: "google", // google yandex bing
     textTranslatorService: "google", // google yandex bing deepl
     textToSpeechService: "google", // google bing
-    enabledServices: ["google", "bing", "yandex", "deepl"],
+    enabledServices: ["google", "bing", "yandex", "deepl", "openai"],
     ttsSpeed: 1.0,
     ttsVolume: 1.0,
     targetLanguage: null,
@@ -212,6 +212,7 @@ const twpConfig = (function () {
     twpConfig.onReady(function () {
       if (areaName === "local") {
         for (const name in changes) {
+          if (name === "openaiCredentials" || name === "openaiStatus") continue;
           const newValue = changes[name].newValue;
           if (config[name] !== newValue) {
             config[name] = fixObjectType(name, newValue);
@@ -227,6 +228,7 @@ const twpConfig = (function () {
     chrome.storage.local.get(null, (onGot) => {
       // load config; convert object/array to map/set if necessary
       for (const name in onGot) {
+        if (name === "openaiCredentials" || name === "openaiStatus") continue;
         config[name] = fixObjectType(name, onGot[name]);
       }
 
@@ -547,7 +549,7 @@ const twpConfig = (function () {
    * @returns {string} newServiceName
    */
   twpConfig.swapPageTranslationService = function () {
-    const pageTranslationServices = ["google", "bing", "yandex"];
+    const pageTranslationServices = ["google", "bing", "yandex", "openai"];
     const pageEnabledServices = twpConfig
       .get("enabledServices")
       .filter((svName) => pageTranslationServices.includes(svName));

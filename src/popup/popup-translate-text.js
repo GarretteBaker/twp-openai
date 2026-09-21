@@ -148,6 +148,7 @@ twpConfig
     const eTextTranslated = document.getElementById("eTextTranslated");
 
     const sGoogle = document.getElementById("sGoogle");
+    const sOpenAI = document.getElementById("sOpenAI");
     const sYandex = document.getElementById("sYandex");
     const sBing = document.getElementById("sBing");
     const sDeepL = document.getElementById("sDeepL");
@@ -189,6 +190,7 @@ twpConfig
       twpConfig.set("textTranslatorService", "google");
       translateText();
 
+      sOpenAI.classList.remove("selected");
       sGoogle.classList.remove("selected");
       sYandex.classList.remove("selected");
       sBing.classList.remove("selected");
@@ -197,11 +199,26 @@ twpConfig
 
       sGoogle.classList.add("selected");
     };
+    sOpenAI.onclick = () => {
+      currentTextTranslatorService = "openai";
+      twpConfig.set("textTranslatorService", "openai");
+      translateText();
+
+      sOpenAI.classList.remove("selected");
+      sGoogle.classList.remove("selected");
+      sYandex.classList.remove("selected");
+      sBing.classList.remove("selected");
+      sDeepL.classList.remove("selected");
+      sLibre.classList.remove("selected");
+
+      sOpenAI.classList.add("selected");
+    };
     sYandex.onclick = () => {
       currentTextTranslatorService = "yandex";
       twpConfig.set("textTranslatorService", "yandex");
       translateText();
 
+      sOpenAI.classList.remove("selected");
       sGoogle.classList.remove("selected");
       sYandex.classList.remove("selected");
       sBing.classList.remove("selected");
@@ -215,6 +232,7 @@ twpConfig
       twpConfig.set("textTranslatorService", "bing");
       translateText();
 
+      sOpenAI.classList.remove("selected");
       sGoogle.classList.remove("selected");
       sYandex.classList.remove("selected");
       sBing.classList.remove("selected");
@@ -228,6 +246,7 @@ twpConfig
       twpConfig.set("textTranslatorService", "deepl");
       translateText();
 
+      sOpenAI.classList.remove("selected");
       sGoogle.classList.remove("selected");
       sYandex.classList.remove("selected");
       sBing.classList.remove("selected");
@@ -241,6 +260,7 @@ twpConfig
       twpConfig.set("textTranslatorService", "libre");
       translateText();
 
+      sOpenAI.classList.remove("selected");
       sGoogle.classList.remove("selected");
       sYandex.classList.remove("selected");
       sBing.classList.remove("selected");
@@ -336,6 +356,9 @@ twpConfig
     }
 
     switch (currentTextTranslatorService) {
+      case "openai":
+        sOpenAI.classList.add("selected");
+        break;
       case "yandex":
         sYandex.classList.add("selected");
         break;
@@ -356,11 +379,8 @@ twpConfig
     }
 
     const enabledServices = twpConfig.get("enabledServices");
-    if (enabledServices.includes("google")) {
-      sGoogle.removeAttribute("hidden");
-    } else {
-      sGoogle.setAttribute("hidden", "");
-    }
+    sGoogle.hidden = !enabledServices.includes("google");
+    sOpenAI.hidden = !enabledServices.includes("openai");
     if (enabledServices.includes("bing")) {
       sBing.removeAttribute("hidden");
     } else {
@@ -385,6 +405,7 @@ twpConfig
     twpConfig.onChanged((name, newvalue) => {
       switch (name) {
         case "enabledServices": {
+          sOpenAI.hidden = !newvalue.includes("openai");
           const enabledServices = newvalue;
           if (enabledServices.includes("google")) {
             sGoogle.removeAttribute("hidden");

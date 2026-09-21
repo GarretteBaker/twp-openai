@@ -259,6 +259,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
 				</ul>
 				<div id="moreOrLess"><i class="arrow up" id="more"></i><i class="arrow down" id="less"></i></div>
 				<ul>
+					<li title="OpenAI" id="sOpenAI">AI</li>
 					<li title="Google" id="sGoogle">g</li>
 					<li title="Bing" id="sBing">b</li>
 					<li title="Yandex" id="sYandex">y</li>
@@ -393,6 +394,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
     const eLess = shadowRoot.getElementById("less");
 
     const sGoogle = shadowRoot.getElementById("sGoogle");
+    const sOpenAI = shadowRoot.getElementById("sOpenAI");
     const sYandex = shadowRoot.getElementById("sYandex");
     const sBing = shadowRoot.getElementById("sBing");
     const sDeepL = shadowRoot.getElementById("sDeepL");
@@ -501,6 +503,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
       twpConfig.set("textTranslatorService", "google");
       translateNewInput();
 
+      sOpenAI.classList.remove("selected");
       sGoogle.classList.remove("selected");
       sYandex.classList.remove("selected");
       sBing.classList.remove("selected");
@@ -509,11 +512,26 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
 
       sGoogle.classList.add("selected");
     };
+    sOpenAI.onclick = () => {
+      currentTextTranslatorService = "openai";
+      twpConfig.set("textTranslatorService", "openai");
+      translateNewInput();
+
+      sOpenAI.classList.remove("selected");
+      sGoogle.classList.remove("selected");
+      sYandex.classList.remove("selected");
+      sBing.classList.remove("selected");
+      sDeepL.classList.remove("selected");
+      sLibre.classList.remove("selected");
+
+      sOpenAI.classList.add("selected");
+    };
     sYandex.onclick = () => {
       currentTextTranslatorService = "yandex";
       twpConfig.set("textTranslatorService", "yandex");
       translateNewInput();
 
+      sOpenAI.classList.remove("selected");
       sGoogle.classList.remove("selected");
       sYandex.classList.remove("selected");
       sBing.classList.remove("selected");
@@ -527,6 +545,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
       twpConfig.set("textTranslatorService", "bing");
       translateNewInput();
 
+      sOpenAI.classList.remove("selected");
       sGoogle.classList.remove("selected");
       sYandex.classList.remove("selected");
       sBing.classList.remove("selected");
@@ -540,6 +559,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
       twpConfig.set("textTranslatorService", "deepl");
       translateNewInput();
 
+      sOpenAI.classList.remove("selected");
       sGoogle.classList.remove("selected");
       sYandex.classList.remove("selected");
       sBing.classList.remove("selected");
@@ -553,6 +573,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
       twpConfig.set("textTranslatorService", "libre");
       translateNewInput();
 
+      sOpenAI.classList.remove("selected");
       sGoogle.classList.remove("selected");
       sYandex.classList.remove("selected");
       sBing.classList.remove("selected");
@@ -660,7 +681,9 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
       );
     }
 
-    if (currentTextTranslatorService === "yandex") {
+    if (currentTextTranslatorService === "openai") {
+      sOpenAI.classList.add("selected");
+    } else if (currentTextTranslatorService === "yandex") {
       sYandex.classList.add("selected");
     } else if (currentTextTranslatorService == "deepl") {
       sDeepL.classList.add("selected");
@@ -673,11 +696,8 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
     }
 
     const enabledServices = twpConfig.get("enabledServices");
-    if (enabledServices.includes("google")) {
-      sGoogle.removeAttribute("hidden");
-    } else {
-      sGoogle.setAttribute("hidden", "");
-    }
+    sGoogle.hidden = !enabledServices.includes("google");
+    sOpenAI.hidden = !enabledServices.includes("openai");
     if (enabledServices.includes("bing")) {
       sBing.removeAttribute("hidden");
     } else {
@@ -719,6 +739,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
     twpConfig.onChanged((name, newvalue) => {
       switch (name) {
         case "enabledServices": {
+          sOpenAI.hidden = !newvalue.includes("openai");
           const enabledServices = newvalue;
           if (enabledServices.includes("google")) {
             sGoogle.removeAttribute("hidden");

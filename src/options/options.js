@@ -1136,6 +1136,7 @@ twpConfig
         { selector: "#btnEnableBing", svName: "bing" },
         { selector: "#btnEnableYandex", svName: "yandex" },
         { selector: "#btnEnableDeepL", svName: "deepl" },
+        { selector: "#btnEnableOpenAI", svName: "openai" },
       ];
 
       servicesInfo.forEach((svInfo) => {
@@ -1174,7 +1175,7 @@ twpConfig
             twpConfig.set("pageTranslatorService", enabledServices[0]);
           }
 
-          const pageTranslationServices = ["google", "bing", "yandex"];
+          const pageTranslationServices = ["google", "bing", "yandex", "openai"];
           chrome.runtime.sendMessage(
             {
               action: "restorePagesWithServiceNames",
