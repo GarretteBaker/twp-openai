@@ -40,9 +40,11 @@ uv run tests/firefox-smoke.py
 uv run python tools/package-firefox.py
 ```
 
-The Firefox smoke test uses Selenium in a temporary, isolated profile and injects a fake API only into its temporary test package. It uses no real API key and makes no paid translation calls. The distributable package excludes that mock. Selenium may download geckodriver on first use. The smoke test checks settings, API integration, key-free settings export, page translation, links/formatting/inputs, dynamic content, restoring originals, and selected-text translation.
+By default, the Firefox smoke test uses Selenium in a temporary, isolated profile and injects a fake API only into its temporary test package. This default mode uses no real API key and makes no paid translation calls. The distributable package excludes that mock. Selenium may download geckodriver on first use. The smoke test checks settings, API integration, key-free settings export, page translation, links/formatting/inputs, dynamic content, restoring originals, and selected-text translation.
 
-As shipped, protocol/DOM behavior has been tested with mocked responses. Live model quality and account-specific API access have not been tested.
+To run the same checks against the real API, export `OPENAI_API_KEY` in your shell and run `uv run tests/firefox-smoke.py --live`. This opt-in mode makes paid requests with `gpt-4.1-mini`; it reads the key from the environment, enters it only in the temporary Firefox profile, and does not add it to source files or packages. The profile is removed when Firefox exits.
+
+Protocol/DOM behavior has been verified with mocked responses. A successful live translation and model quality evaluation are still pending.
 
 ## References
 
