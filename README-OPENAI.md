@@ -44,7 +44,7 @@ By default, the Firefox smoke test uses Selenium in a temporary, isolated profil
 
 To run the same checks against the real API, export `OPENAI_API_KEY` in your shell and run `uv run tests/firefox-smoke.py --live`. This opt-in mode makes paid requests with `gpt-4.1-mini`; it reads the key from the environment, enters it only in the temporary Firefox profile, and does not add it to source files or packages. The profile is removed when Firefox exits.
 
-Protocol/DOM behavior has been verified with mocked responses. A successful live translation and model quality evaluation are still pending.
+Both the mocked tests and the live Firefox smoke test have passed. The live test used `gpt-4.1-mini` to translate a small French fixture into English, verifying settings, API requests, page translation, links/formatting/inputs, dynamic content, exact restoration, and selected-text translation. Translation quality across languages and larger real-world pages has not been evaluated.
 
 ## References
 
